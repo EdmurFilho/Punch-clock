@@ -1,66 +1,41 @@
-#include <Arduino.h>
-#include <WiFi.h>
-#include <HTTPClient.h>
+#include <SPI.h>
+#include <MFRC522.h>
 
-// --- Configure aqui ---
-const char* ssid = "SEU_SSID";         // Nome da sua rede Wi-Fi
-const char* password = "SUA_SENHA";    // Senha da sua rede Wi-Fi
-String scriptURL = "SUA_URL_DO_APPS_SCRIPT"; // URL que você copiou do Apps Script
-// ----------------------
+// 🟢 Definição dos pinos (para o SPI padrão do ESP32)
+#define SS_PIN  5     // SDA no módulo RC522
+#define RST_PIN 22    // RST no módulo RC522
+
+MFRC522 mfrc522(SS_PIN, RST_PIN);  // Cria o objeto do leitor
 
 void setup() {
   Serial.begin(115200);
-  delay(1000);
-
-  // Conectar ao Wi-Fi
-  Serial.print("Conectando a ");
-  Serial.println(ssid);
-  WiFi.begin(ssid, password);
-  
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("\nWiFi conectado!");
-  Serial.print("Endereço IP: ");
-  Serial.println(WiFi.localIP());
+  SPI.begin(18, 19, 23, SS_PIN);   // SCK=18, MISO=19, MOSI=23, SS=5
+  mfrc522.PCD_Init();              // Inicializa o RC522
+  Serial.println("Aproxime o cartão RFID do leitor...");
 }
 
 void loop() {
-  
-}
+  // Verifica se há um novo cartão
+  if (!mfrc522.PICC_IsNewCardPresent()) return;
 
-void enviarDados(String valor1, String valor2) {
-  if (WiFi.status() == WL_CONNECTED) {
-   
-    HTTPClient http;
-    String urlCompleta = scriptURL;
-    urlCompleta += "?valor1=" + valor1;
-    urlCompleta += "&valor2=" + valor2;
+  // Verifica se o cartão pode ser lido
+  if (!mfrc522.PICC_ReadCardSerial()) return;
 
-    Serial.print("Enviando dados para: ");
-    Serial.println(urlCompleta);
+  Serial.print("TAG UID: ");
 
-    http.begin(urlCompleta);
-    http.setFollowRedirects(HTTPC_FORCE_FOLLOW_REDIRECTS); 
-
- 
-    int httpCode = http.GET();
-
-    if (httpCode > 0) {
-      Serial.printf("[HTTP] Código da resposta: %d\n", httpCode);
-
-      if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
-        String payload = http.getString();
-        Serial.println("[HTTP] Resposta do servidor:");
-        Serial.println(payload);
-      }
-    } else {
-      Serial.printf("[HTTP] Falha no GET, erro: %s\n", http.errorToString(httpCode).c_str());
-    }
-
-    http.end();
-  } else {
-    Serial.println("Erro: WiFi não conectado");
+  // Lê os bytes do UID e imprime em HEX
+  for (byte i = 0; i < mfrc522.uid.size; i++) {
+    Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? "0" : "");
+    Serial.print(mfrc522.uid.uidByte[i], HEX);
+    Serial.print(" ");
   }
+  Serial.println();
+
+  // Opcional: mostra o tipo do cartão
+  MFRC522::PICC_Type tipo = mfrc522.PICC_GetType(mfrc522.uid.sak);
+  Serial.print("Tipo do cartão: ");
+  Serial.println(mfrc522.PICC_GetTypeName(tipo));
+
+  // Para evitar leituras repetidas rápidas
+  delay(1000);
 }
