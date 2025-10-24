@@ -13,7 +13,7 @@ void setup() {
   delay(1000);
 
   // Conectar ao Wi-Fi
-  Serial.print("Conectando ao ");
+  Serial.print("Conectando a rede ");
   Serial.println(ssid);
   WiFi.begin(ssid, password);
   
