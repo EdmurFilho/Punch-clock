@@ -7,13 +7,14 @@ LiquidCrystal_I2C lcd(0x27,16,2);
 
 const byte UID_SIZE = 4;
 
-struct Funcionario {
+struct Registros {
     const char* uid_str; 
-    const char* nome;    
+    const char* nome;  
+    bool estado;
 };
 
-const Funcionario LISTA_PESSOAS[] = {
-    {"D3 EB 1E F4", "Edmur"},  
+Registros LISTA_PESSOAS[] = {
+    {"D3 EB 1E F4", "Edmur", 0},  
 };
 
 const int NUM_PESSOAS = sizeof(LISTA_PESSOAS) / sizeof(LISTA_PESSOAS[0]);
@@ -22,6 +23,9 @@ const int NUM_PESSOAS = sizeof(LISTA_PESSOAS) / sizeof(LISTA_PESSOAS[0]);
 #define RST_PIN 4    // RST no módulo RC522
 
 MFRC522 mfrc522(SS_PIN, RST_PIN);  // Cria o objeto do leitor
+
+bool UIDvalido = true;
+int indice;
 
 void setup() {
   lcd.init();                      
@@ -38,9 +42,26 @@ void loop() {
     String uid_lido = formatarUID(mfrc522.uid.uidByte, mfrc522.uid.size);
     Serial.print("TAG UID: ");
     Serial.print(uid_lido);
+    const char* pessoa = buscarNomePorUID(uid_lido);
+    if(UIDvalido){
+      bool acao = LISTA_PESSOAS[indice].estado;
+      lcd.clear();
+      lcd.setCursor(0, 1);
+      lcd.print(pessoa);
+      lcd.setCursor(10,1);
+      lcd.print(!acao ? "entrou" : "saiu");
+      LISTA_PESSOAS[indice].estado = !LISTA_PESSOAS[indice].estado;
+      delay(1000);
+      lcd.clear();
+    }else{
+      lcd.clear();
+      lcd.setCursor(1,0);
+      lcd.print("TAG INVALIDO!");
+      delay(1000);
+      lcd.clear();
+    }
   }
-  delay(1000);
-  }
+}
 
 String formatarUID(byte *buffer, byte bufferSize) {
     String str_uid = "";
@@ -63,15 +84,13 @@ const char* buscarNomePorUID(String uid_procurado) {
     for (int i = 0; i < NUM_PESSOAS; i++) {
         // Compara a String do UID lido com a String do UID cadastrado
         if (uid_procurado.equals(LISTA_PESSOAS[i].uid_str)) {
+            UIDvalido = true;
+            indice = i;
             return LISTA_PESSOAS[i].nome; // Encontrou! Retorna o nome
         }
     }
     Serial.print("UID DESCONHECIDO: ");
     Serial.println(uid_procurado);
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("NAO REGISTRADO!");
-    lcd.setCursor(0, 1);
-    lcd.print("Cadastre a TAG");
+    UIDvalido = false;
     return nullptr; // UID não encontrado
-}
+} 
