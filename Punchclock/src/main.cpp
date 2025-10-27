@@ -60,7 +60,7 @@ void setup(){
   lcd.init();                      
   lcd.backlight();
   
-  pinMode(ModeSwitch, INPUT_PULLUP)
+  pinMode(ModeSwitch, INPUT_PULLUP);
   pinMode(CLOCK, INPUT_PULLUP); // Define o pino CLOCK como entrada com pull-up.
   pinMode(DATA, INPUT_PULLUP);
 
