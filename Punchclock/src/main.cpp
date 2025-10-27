@@ -4,12 +4,11 @@
 #include <LiquidCrystal_I2C.h>
 
 LiquidCrystal_I2C lcd(0x27,16,2);
-
 const byte UID_SIZE = 4;
 
 struct Registros {
-    const char* uid_str; 
-    const char* nome;  
+    char uid_str[12];
+    char nome[10];  
     bool estado;
 };
 
@@ -17,23 +16,60 @@ Registros LISTA_PESSOAS[] = {
     {"D3 EB 1E F4", "Edmur", 0},  
 };
 
-const int NUM_PESSOAS = sizeof(LISTA_PESSOAS) / sizeof(LISTA_PESSOAS[0]);
+const int MAX_PESSOAS = 50;
+Registros LISTA_PESSOAS[MAX_PESSOAS];
+int numPessoas = 0;
 
-#define SS_PIN  5     // SDA no módulo RC522
-#define RST_PIN 4    // RST no módulo RC522
+#define ModeSwitch 34
+#define CLOCK 22
+#define DATA 21
+
+const char keymap[] = {
+  0, 0,  0,  0,  0,  0,  0,  0,
+  0, 0,  0,  0,  0,  0, '`', 0,
+  0, 0 , 0 , 0,  0, 'q','1', 0,
+  0, 0, 'z','s','a','w','2', 0,
+  0,'c','x','d','e','4','3', 0,
+  0,' ','v','f','t','r','5', 0,
+  0,'n','b','h','g','y','6', 0,
+  0, 0, 'm','j','u','7','8', 0,
+  0,',','k','i','o','0','9', 0,
+  0,'.','/','l',';','p','-', 0,
+  0, 0,'\'', 0,'[', '=', 0, 0,
+  0, 0,13, ']', 0, '\\', 0, 0,
+  0, 0, 0, 0, 0, 0, 127, 0,
+  0,'1', 0,'4','7', 0, 0, 0,
+  '0','.','2','5','6','8', 0, 0,
+  0,'+','3','-','*','9', 0, 0,
+  0, 0, 0, 0 };
+
+uint8_t lastscan;
+
+#define SS_PIN  5     
+#define RST_PIN 4
 
 MFRC522 mfrc522(SS_PIN, RST_PIN);  // Cria o objeto do leitor
 
 bool UIDvalido = true;
 int indice;
 
-void setup() {
+String formatarUID(byte *buffer, byte bufferSize);
+const char* buscarNomePorUID(String uid_procurado);
+
+void setup(){
   lcd.init();                      
   lcd.backlight();
   
+  pinMode(ModeSwitch, INPUT_PULLUP)
+  pinMode(CLOCK, INPUT_PULLUP); // Define o pino CLOCK como entrada com pull-up.
+  pinMode(DATA, INPUT_PULLUP);
+
+  bitSet(PCICR, PCIE2);
+  bitSet(PCMSK2, CLOCK);
+
   Serial.begin(115200);
-  SPI.begin(18, 19, 23, SS_PIN);   // SCK=18, MISO=19, MOSI=23, SS=5
-  mfrc522.PCD_Init();              // Inicializa o RC522
+  SPI.begin(18, 19, 23, SS_PIN);   
+  mfrc522.PCD_Init();              
   Serial.println("Aproxime o cartão mfrc522 do leitor...");
 }
 
@@ -48,8 +84,10 @@ void loop() {
       lcd.clear();
       lcd.setCursor(0, 1);
       lcd.print(pessoa);
+      Serial.println(pessoa);
       lcd.setCursor(10,1);
       lcd.print(!acao ? "entrou" : "saiu");
+      Serial.println(!acao ? "entrou" : "saiu");
       LISTA_PESSOAS[indice].estado = !LISTA_PESSOAS[indice].estado;
       delay(1000);
       lcd.clear();
@@ -57,6 +95,7 @@ void loop() {
       lcd.clear();
       lcd.setCursor(1,0);
       lcd.print("TAG INVALIDO!");
+      Serial.println("TAG INVALIDO!");
       delay(1000);
       lcd.clear();
     }
@@ -81,7 +120,7 @@ String formatarUID(byte *buffer, byte bufferSize) {
 
 const char* buscarNomePorUID(String uid_procurado) {
     // Itera sobre o array constante
-    for (int i = 0; i < NUM_PESSOAS; i++) {
+    for (int i = 0; i < MAX_PESSOAS; i++) {
         // Compara a String do UID lido com a String do UID cadastrado
         if (uid_procurado.equals(LISTA_PESSOAS[i].uid_str)) {
             UIDvalido = true;
