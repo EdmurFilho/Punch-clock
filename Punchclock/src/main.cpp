@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <SPI.h>
 #include <MFRC522.h>
 #include <Wire.h> 
@@ -43,7 +44,11 @@ const char keymap[] = {
   0,'+','3','-','*','9', 0, 0,
   0, 0, 0, 0 };
 
-uint8_t lastscan;
+volatile uint8_t bit_count = 0;
+volatile uint32_t data_buffer = 0;
+volatile unsigned long last_interrupt_time = 0;
+volatile uint8_t scancode = 0;
+volatile bool new_data_available = false;
 
 #define SS_PIN  5     
 #define RST_PIN 4
@@ -63,9 +68,6 @@ void setup(){
   pinMode(ModeSwitch, INPUT_PULLUP);
   pinMode(CLOCK, INPUT_PULLUP); // Define o pino CLOCK como entrada com pull-up.
   pinMode(DATA, INPUT_PULLUP);
-
-  bitSet(PCICR, PCIE2);
-  bitSet(PCMSK2, CLOCK);
 
   Serial.begin(115200);
   SPI.begin(18, 19, 23, SS_PIN);   
