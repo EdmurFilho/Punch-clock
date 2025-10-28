@@ -20,8 +20,8 @@ Registros LISTA_PESSOAS[MAX_PESSOAS];
 int numPessoas = 0;
 
 #define ModeSwitch 34
-#define CLOCK 16
-#define DATA 17
+#define CLOCK 26
+#define DATA 25
 
 const char keymap[] = {
   0, 0,  0,  0,  0,  0,  0,  0,
