@@ -65,6 +65,8 @@ int indice;
 
 String formatarUID(byte *buffer, byte bufferSize);
 const char* buscarNomePorUID(String uid_procurado);
+char* handleKeyboardInput(LiquidCrystal_I2C &lcd);
+bool adicionarPessoa(const String& uid, const char* nome);
 
 void setup(){
   lcd.init();                      
@@ -89,6 +91,9 @@ void loop() {
   bool Mode = digitalRead(ModeSwitch);
   if (!Mode && mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial()) {
     Confirm_UID();
+  }
+  if(Mode){
+    Serial.println("digite!");
   }
   while (Mode){
     char* completed_string = handleKeyboardInput(lcd);
@@ -235,6 +240,8 @@ char* handleKeyboardInput(LiquidCrystal_I2C &lcd) {
       }
       else if (c != 0 && string_index < 10) { // Caractere normal
         my_string[string_index] = c;
+        lcd.setCursor(string_index, 1);
+        lcd.print(c);
         string_index++;
         my_string[string_index] = '\0';
         
