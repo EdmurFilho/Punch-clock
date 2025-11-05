@@ -45,10 +45,14 @@ bool escreverEmCelula(String identificacao, String celula, String dado);
 String lerCelula(String identificacao, String celula);
 void montarCabecalho(String _boardID, const String& colunaInicial, const std::vector<String>& cabecalhos);
 
+#define buzzer 32
+
 void setup() {
   lcd.init();                      
   lcd.backlight();
   
+  pinMode(buzzer, OUTPUT);
+
   Serial.begin(115200);
   SPI.begin(18, 19, 23, SS_PIN);   // SCK=18, MISO=19, MOSI=23, SS=5
   mfrc522.PCD_Init();              // Inicializa o RC522
@@ -83,6 +87,7 @@ void loop() {
       bool acao = LISTA_PESSOAS[indice].estado;
       acaoS = !acao ? "Entrou" : "Saiu";
       lcd.clear();
+      digitalWrite(buzzer, 1);
       lcd.setCursor(0, 1);
       Serial.println(pessoa);
       lcd.print(pessoa);
@@ -90,10 +95,14 @@ void loop() {
       Serial.println(acaoS);
       lcd.print(acaoS);
       LISTA_PESSOAS[indice].estado = !LISTA_PESSOAS[indice].estado;
-      delay(1000);
-      lcd.clear();
+      delay(200);
+      digitalWrite(buzzer, 0);
+      delay(300);
       const char* DadosParaEnviar[] = {pessoa, acaoS};
       escreverEmLista("ESP32", 2, DadosParaEnviar);
+      lcd.clear();
+      
+      
     }else{
       lcd.clear();
       lcd.setCursor(1,0);
