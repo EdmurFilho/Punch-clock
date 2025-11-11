@@ -44,8 +44,14 @@ void montarCabecalho(String _boardID, const String& colunaInicial, const std::ve
 bool escreverEmCelula(String identificacao, String celula, String dado);
 String lerCelula(String identificacao, String celula);
 void montarCabecalho(String _boardID, const String& colunaInicial, const std::vector<String>& cabecalhos);
+void playConfirmBeep();
+void playRejectBeep();
 
 #define buzzer 32
+#define Red 13
+#define Green 12
+
+bool comum = 0;
 
 void setup() {
   lcd.init();                      
@@ -86,8 +92,8 @@ void loop() {
     if(UIDvalido){
       bool acao = LISTA_PESSOAS[indice].estado;
       acaoS = !acao ? "Entrou" : "Saiu";
+      digitalWrite(Green, comum);
       lcd.clear();
-      digitalWrite(buzzer, 1);
       lcd.setCursor(0, 1);
       Serial.println(pessoa);
       lcd.print(pessoa);
@@ -95,19 +101,20 @@ void loop() {
       Serial.println(acaoS);
       lcd.print(acaoS);
       LISTA_PESSOAS[indice].estado = !LISTA_PESSOAS[indice].estado;
-      delay(200);
-      digitalWrite(buzzer, 0);
-      delay(300);
+      playConfirmBeep();
+      delay(100);
+      digitalWrite(Green, !comum);
       const char* DadosParaEnviar[] = {pessoa, acaoS};
       escreverEmLista("ESP32", 2, DadosParaEnviar);
       lcd.clear();
-      
-      
     }else{
+      digitalWrite(Red, comum);
       lcd.clear();
       lcd.setCursor(1,0);
       lcd.print("TAG INVALIDO!");
-      delay(1000);
+      playRejectBeep();
+      delay(100);
+      digitalWrite(Red, !comum);
       lcd.clear();
     }
   }
@@ -327,4 +334,21 @@ void montarCabecalho(String _boardID, const String& colunaInicial, const std::ve
       if (coluna > 'Z') coluna = 'A';
     }
   }
+}
+
+void playRejectBeep() {
+  Serial.println("Tocando bipe de REJEICAO...");
+  tone(buzzer, 200);
+  delay(150);
+  noTone(150 / 2); 
+  tone(buzzer, 100);
+  delay(150);
+  noTone(buzzer);
+}
+
+void playConfirmBeep() {
+  Serial.println("Tocando bipe de CONFIRMACAO...");
+  tone(buzzer, 1500); 
+  delay(100);       
+  noTone(buzzer);           
 }
