@@ -48,10 +48,7 @@ void playConfirmBeep();
 void playRejectBeep();
 
 #define buzzer 32
-#define Red 13
-#define Green 12
-
-bool comum = 0;
+#define Led 13
 
 void setup() {
   lcd.init();                      
@@ -92,7 +89,7 @@ void loop() {
     if(UIDvalido){
       bool acao = LISTA_PESSOAS[indice].estado;
       acaoS = !acao ? "Entrou" : "Saiu";
-      digitalWrite(Green, comum);
+      digitalWrite(Led, 1);
       lcd.clear();
       lcd.setCursor(0, 1);
       Serial.println(pessoa);
@@ -103,18 +100,23 @@ void loop() {
       LISTA_PESSOAS[indice].estado = !LISTA_PESSOAS[indice].estado;
       playConfirmBeep();
       delay(100);
-      digitalWrite(Green, !comum);
+      digitalWrite(1, 0);
       const char* DadosParaEnviar[] = {pessoa, acaoS};
       escreverEmLista("ESP32", 2, DadosParaEnviar);
       lcd.clear();
     }else{
-      digitalWrite(Red, comum);
+      digitalWrite(Led, 1);
       lcd.clear();
       lcd.setCursor(1,0);
       lcd.print("TAG INVALIDO!");
+      delay(150);
+      digitalWrite(Led, 0);
+      delay(80);
+      digitalWrite(Led, 1);
       playRejectBeep();
+      digitalWrite(Led, 0);
       delay(100);
-      digitalWrite(Red, !comum);
+      
       lcd.clear();
     }
   }
