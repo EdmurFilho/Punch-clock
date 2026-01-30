@@ -7,8 +7,8 @@
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 
-const char* WIFI_SSID  = "Paradiso";
-const char* WIFI_PASSWORD = "8167350Rm";
+const char* WIFI_SSID  = "CSN-Citap";
+const char* WIFI_PASSWORD = "Csn@2520";
 const char* googleScriptURL = "https://script.google.com/macros/s/AKfycbzKDTB0AF1i-2s98-PGGb_tyA1vLXqO0yyGhnQ0Ojj8XqDpp5cZslnmx3wD8fYhhGX6Uw/exec";
 
 LiquidCrystal_I2C lcd(0x27,16,2);
@@ -48,13 +48,16 @@ void playConfirmBeep();
 void playRejectBeep();
 
 #define buzzer 32
-#define Led 13
+#define Red 13
+#define Green 12
 
 void setup() {
   lcd.init();                      
   lcd.backlight();
   
   pinMode(buzzer, OUTPUT);
+  pinMode(Red, OUTPUT); 
+  pinMode(Green, OUTPUT);
 
   Serial.begin(115200);
   SPI.begin(18, 19, 23, SS_PIN);   // SCK=18, MISO=19, MOSI=23, SS=5
@@ -89,7 +92,7 @@ void loop() {
     if(UIDvalido){
       bool acao = LISTA_PESSOAS[indice].estado;
       acaoS = !acao ? "Entrou" : "Saiu";
-      digitalWrite(Led, 1);
+      digitalWrite(Green, 1);
       lcd.clear();
       lcd.setCursor(0, 1);
       Serial.println(pessoa);
@@ -100,21 +103,21 @@ void loop() {
       LISTA_PESSOAS[indice].estado = !LISTA_PESSOAS[indice].estado;
       playConfirmBeep();
       delay(100);
-      digitalWrite(1, 0);
+      digitalWrite(Green, 0);
       const char* DadosParaEnviar[] = {pessoa, acaoS};
       escreverEmLista("ESP32", 2, DadosParaEnviar);
       lcd.clear();
     }else{
-      digitalWrite(Led, 1);
+      digitalWrite(Red, 1);
       lcd.clear();
       lcd.setCursor(1,0);
       lcd.print("TAG INVALIDO!");
       delay(150);
-      digitalWrite(Led, 0);
+      digitalWrite(Red, 0);
       delay(80);
-      digitalWrite(Led, 1);
+      digitalWrite(Red, 1);
       playRejectBeep();
-      digitalWrite(Led, 0);
+      digitalWrite(Red, 0);
       delay(100);
       
       lcd.clear();
