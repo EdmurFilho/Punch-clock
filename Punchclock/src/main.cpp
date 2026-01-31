@@ -7,11 +7,9 @@
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 
-//const char* WIFI_SSID  = "CSN-Citap";
-//const char* WIFI_PASSWORD = "Csn@2520";
-const char* WIFI_SSID  = "Paradiso";
-const char* WIFI_PASSWORD = "8167350Rm";
-const char* googleScriptURL = "https://script.google.com/macros/s/AKfycbzKDTB0AF1i-2s98-PGGb_tyA1vLXqO0yyGhnQ0Ojj8XqDpp5cZslnmx3wD8fYhhGX6Uw/exec";
+const char* WIFI_SSID  = "CSN-Citap";
+const char* WIFI_PASSWORD = "Csn@2520";
+const char* googleScriptURL = "";
 
 LiquidCrystal_I2C lcd(0x27,16,2);
 
