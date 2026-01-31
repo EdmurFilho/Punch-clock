@@ -7,9 +7,11 @@
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 
-const char* WIFI_SSID  = "CSN-Citap";
-const char* WIFI_PASSWORD = "Csn@2520";
-const char* googleScriptURL = "";
+//const char* WIFI_SSID  = "CSN-Citap";
+//const char* WIFI_PASSWORD = "Csn@2520";
+const char* WIFI_SSID  = "Paradiso";
+const char* WIFI_PASSWORD = "8167350Rm";
+const char* googleScriptURL = "https://script.google.com/macros/s/AKfycbzKDTB0AF1i-2s98-PGGb_tyA1vLXqO0yyGhnQ0Ojj8XqDpp5cZslnmx3wD8fYhhGX6Uw/exec";
 
 LiquidCrystal_I2C lcd(0x27,16,2);
 
@@ -22,7 +24,22 @@ struct Registros {
 };
 
 Registros LISTA_PESSOAS[] = {
-    {"D3 EB 1E F4", "Edmur", 0},  
+    {"2B 7A 18 0A", "Edmur", 0},
+    {"D3 EB 1E F4", "Davi", 0},
+    {"13 67 29 F4", "Luis F.", 0},
+    {"D3 D0 20 F4", "Yasmin", 0},
+    {"43 29 34 F4", "Manuela", 0},
+    {"D3 58 21 F4", "João", 0},
+    {"53 E0 28 F4", "Felipe R.", 0},
+    {"13 91 1E F4", "Enzo", 0},
+    {"C3 30 1F F4", "Maria A.", 0},
+    {"43 90 33 F4", "Tiemi", 0},
+    {"B9 1A 07 81", "Laura", 0},
+    {"63 23 34 F4", "Kari", 0},
+    {"93 60 2B F4", "Maria C.", 0},
+    {"53 C5 38 F4", "Gabriel", 0},
+    {"23 29 2D F4", "Melissa", 0},
+    {"D3 F4 30 F4", "Clara", 0}
 };
 
 const int NUM_PESSOAS = sizeof(LISTA_PESSOAS) / sizeof(LISTA_PESSOAS[0]);
@@ -86,7 +103,7 @@ void loop() {
   if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial()) {
     String uid_lido = formatarUID(mfrc522.uid.uidByte, mfrc522.uid.size);
     Serial.print("TAG UID: ");
-    Serial.print(uid_lido);
+    Serial.println(uid_lido);
     pessoa = buscarNomePorUID(uid_lido);
 
     if(UIDvalido){
@@ -96,7 +113,11 @@ void loop() {
       lcd.clear();
       lcd.setCursor(0, 1);
       Serial.println(pessoa);
-      lcd.print(pessoa);
+      if (pessoa != "João") {
+        lcd.print(pessoa);
+      } else {
+        lcd.print("Joao");
+      }
       lcd.setCursor(10,1);
       Serial.println(acaoS);
       lcd.print(acaoS);
@@ -151,8 +172,7 @@ const char* buscarNomePorUID(String uid_procurado) {
             return LISTA_PESSOAS[i].nome; // Encontrou! Retorna o nome
         }
     }
-    Serial.print("UID DESCONHECIDO: ");
-    Serial.println(uid_procurado);
+    Serial.println("UID DESCONHECIDO!");
     UIDvalido = false;
     return nullptr; // UID não encontrado
 } 
@@ -188,8 +208,8 @@ bool escreverEmLista(String identificacao, int numDados, const char* palavras[])
     WiFiClientSecure client; 
     HTTPClient http;
     
-    // Usando StaticJsonDocument para evitar warnings
-    StaticJsonDocument<256> jsonDoc; 
+    // Usando JsonDocument para evitar warnings
+    JsonDocument jsonDoc; 
     
     jsonDoc["action"] = "escreverEmLista";
     jsonDoc["identificacao"] = identificacao;
@@ -240,8 +260,8 @@ bool escreverEmCelula(String identificacao, String celula, String dado){
     WiFiClientSecure client;
     HTTPClient http;
 
-    // Usando StaticJsonDocument
-    StaticJsonDocument<200> jsonDoc;
+    // Usando JsonDocument
+    JsonDocument jsonDoc;
     jsonDoc["action"] = "escreverEmCelula";
     jsonDoc["identificacao"] = identificacao;
     jsonDoc["celula"] = celula;
@@ -281,8 +301,8 @@ String lerCelula(String identificacao, String celula){
     WiFiClientSecure client;
     HTTPClient http;
     
-    // Usando StaticJsonDocument
-    StaticJsonDocument<200> jsonDoc;
+    // Usando JsonDocument
+    JsonDocument jsonDoc;
     jsonDoc["action"] = "lerCelula";
     jsonDoc["identificacao"] = identificacao;
     jsonDoc["celula"] = celula;
