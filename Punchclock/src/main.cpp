@@ -139,7 +139,6 @@ void loop() {
       playRejectBeep();
       digitalWrite(Red, 0);
       delay(100);
-      
       lcd.clear();
     }
   }
