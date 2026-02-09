@@ -7,9 +7,10 @@
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 
-const char* WIFI_SSID  = "Paradiso";
-const char* WIFI_PASSWORD = "81678167Rm";
-const char* googleScriptURL = "";
+const char* WIFI_SSID  = "CSN-Citap";
+const char* WIFI_PASSWORD = "Csn@2520";
+
+const char* googleScriptURL = "https://script.google.com/macros/s/AKfycbwqX2pEU3lRoJXQ_n1LCmesDW2dtceeorfoseoaIJ9V5b7sVqtJ2io7lfcGP1VVHN_o/exec";
 
 LiquidCrystal_I2C lcd(0x27,16,2);
 
@@ -17,7 +18,7 @@ const byte UID_SIZE = 4;
 
 struct Registros {
     const char* uid_str; 
-    const char* nome;  
+    const char* nome;      
     bool estado;
 };
 
@@ -230,6 +231,7 @@ bool escreverEmLista(String identificacao, int numDados, const char* palavras[])
     
     // Inicia a comunicação usando o cliente seguro
     http.begin(client, url); 
+    http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
     http.addHeader("Content-Type", "application/json");
 
     int httpResponseCode = http.POST(jsonString);
