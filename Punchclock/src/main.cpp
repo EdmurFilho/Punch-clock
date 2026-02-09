@@ -7,8 +7,8 @@
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 
-const char* WIFI_SSID  = "CSN-Citap";
-const char* WIFI_PASSWORD = "Csn@2520";
+const char* WIFI_SSID  = "Paradiso";
+const char* WIFI_PASSWORD = "81678167Rm";
 const char* googleScriptURL = "";
 
 LiquidCrystal_I2C lcd(0x27,16,2);
