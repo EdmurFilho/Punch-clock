@@ -9,6 +9,7 @@
 
 const char* WIFI_SSID  = "CSN-Citap";
 const char* WIFI_PASSWORD = "Csn@2520";
+
 const char* googleScriptURL = "https://script.google.com/macros/s/AKfycbwqX2pEU3lRoJXQ_n1LCmesDW2dtceeorfoseoaIJ9V5b7sVqtJ2io7lfcGP1VVHN_o/exec";
 
 LiquidCrystal_I2C lcd(0x27,16,2);
@@ -17,7 +18,7 @@ const byte UID_SIZE = 4;
 
 struct Registros {
     const char* uid_str; 
-    const char* nome;  
+    const char* nome;      
     bool estado;
 };
 
@@ -133,7 +134,6 @@ void loop() {
       playRejectBeep();
       digitalWrite(Red, 0);
       delay(100);
-      
       lcd.clear();
     }
   }
