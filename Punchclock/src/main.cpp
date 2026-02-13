@@ -24,10 +24,9 @@ struct Registros {
 Registros LISTA_PESSOAS[] = {
     {"2B 7A 18 0A", "Edmur", 0},
     {"D3 EB 1E F4", "Davi", 0},
-    {"13 67 29 F4", "Luis F.", 0},
+    {"13 67 29 F4", "Luiz F.", 0},
     {"D3 D0 20 F4", "Yasmin", 0},
     {"43 29 34 F4", "Manuela", 0},
-    {"D3 58 21 F4", "João", 0},
     {"53 E0 28 F4", "Felipe R.", 0},
     {"13 91 1E F4", "Enzo", 0},
     {"C3 30 1F F4", "Maria A.", 0},
@@ -111,11 +110,7 @@ void loop() {
       lcd.clear();
       lcd.setCursor(0, 1);
       Serial.println(pessoa);
-      if (pessoa != "João") {
-        lcd.print(pessoa);
-      } else {
-        lcd.print("Joao");
-      }
+      lcd.print(pessoa);
       lcd.setCursor(10,1);
       Serial.println(acaoS);
       lcd.print(acaoS);
