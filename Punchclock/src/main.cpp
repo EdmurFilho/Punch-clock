@@ -367,7 +367,7 @@ void playRejectBeep() {
 
 void playConfirmBeep() {
   Serial.println("Tocando bipe de CONFIRMACAO...");
-  tone(buzzer, 1500); 
+  tone(buzzer, 1501); 
   delay(100);       
   noTone(buzzer);           
 }
